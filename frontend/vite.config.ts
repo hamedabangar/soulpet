@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
       server: {
         proxy: {
           //Target your Node.js backend
-          '/api-proxy': 'http://localhost:5000',
+          '/api-proxy': 'http://localhost:8080',
           
         },
       },
