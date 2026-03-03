@@ -1,0 +1,9 @@
+
+{
+  "name": "SoulPet",
+  "description": "A gamified mental health companion that evolves from an egg into a powerful guardian as you practice self-care.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
