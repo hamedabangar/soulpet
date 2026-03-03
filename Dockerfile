@@ -1,43 +1,39 @@
-# Build frontend
-# ---------- Build stage: build frontend ----------
-FROM node:18 AS build
+# ---------- Build stage: build frontend with Node 22 ----------
+FROM node:22-slim AS build
 WORKDIR /app
 
-# Install root tools/scripts (if any). If your root has no deps, you can skip this.
-COPY package*.json ./
-RUN npm ci || npm install
+# Copy only frontend manifests first for better layer caching
+COPY frontend/package*.json ./frontend/
 
-# Install frontend deps and build
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm ci
-COPY frontend/ .
-RUN npm run build
+# Install deps (prefer npm ci if lock exists, else fallback to npm install)
+# This satisfies npm's lockfile requirement in CI while unblocking if it's missing.
+RUN if [ -f frontend/package-lock.json ]; then \
+      npm ci --prefix frontend; \
+    else \
+      npm install --prefix frontend; \
+    fi
+
+# Copy the rest of the frontend and build
+COPY frontend ./frontend
+RUN npm run --prefix frontend build
 
 # ---------- Runtime stage: backend + built frontend ----------
-FROM node:18
-
-# Security: create non-root user
-RUN useradd -m appuser
+FROM node:22-slim
 WORKDIR /app
 
 # Copy backend source
-COPY backend/ ./backend
+COPY backend ./backend
 
-# Install backend production dependencies into /app/backend
-# (This reads backend/package.json and installs only prod deps)
+# Install backend production deps into /app/backend
 RUN npm ci --omit=dev --prefix backend || npm install --production --prefix backend
 
-# Copy the built frontend artifacts from the build stage
+# Copy built frontend artifact
 COPY --from=build /app/frontend/dist ./frontend/dist
 
-# Environment
+# Environment & port for Cloud Run
 ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080
 
-# (Optional) Drop privileges
-USER appuser
-
-# Start the server (must listen on 0.0.0.0:PORT)
+# Start the server
 CMD ["node", "backend/server.js"]
