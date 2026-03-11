@@ -14,7 +14,8 @@ import rateLimit from 'express-rate-limit';
 const app = express();
 app.use(express.json({limit: process?.env?.API_PAYLOAD_MAX_SIZE || "7mb"}));
 
-const PORT = process?.env?.API_BACKEND_PORT || 8080;
+// const PORT = process?.env?.API_BACKEND_PORT || 8080;
+// const PORT = process.env.PORT || 8080
 const API_BACKEND_HOST = process?.env?.API_BACKEND_HOST || "127.0.0.1";
 const GOOGLE_CLOUD_LOCATION = process?.env?.GOOGLE_CLOUD_LOCATION;
 const GOOGLE_CLOUD_PROJECT = process?.env?.GOOGLE_CLOUD_PROJECT;
@@ -304,16 +305,31 @@ app.post('/api-proxy', async (req, res) => {
   }
 });
 
-const server = app.listen(PORT, API_BACKEND_HOST, () => {
-  console.log(`Vertex AI Backend listening at http://localhost:${PORT}`);
+// const server = app.listen(PORT, "0.0.0.0", () => {
+//   console.log(`Server listening on port ${PORT}`);
+// });
+// const path = require('path');
+// app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+// });
+
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend listening on port ${PORT}`);
 });
-const path = require('path');
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
-
-
 
 
