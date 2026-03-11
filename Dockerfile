@@ -25,8 +25,9 @@ WORKDIR /app
 COPY backend ./backend
 
 # Install backend production deps into /app/backend
-RUN npm ci --omit=dev --prefix backend || npm install --production --prefix backend
-
+# RUN npm ci --omit=dev --prefix backend || npm install --production --prefix backend
+RUN cd backend && npm install --production && cp package-lock.json /app/backend/package-lock.json
+RUN npm ci --omit=dev --prefix backend
 # Copy built frontend artifact
 COPY --from=build /app/frontend/dist ./frontend/dist
 
