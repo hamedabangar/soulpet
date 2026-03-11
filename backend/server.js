@@ -9,6 +9,8 @@ import express from 'express';
 import { GoogleAuth } from 'google-auth-library';
 import fetch from 'node-fetch';
 import rateLimit from 'express-rate-limit';
+import path from "path";
+import { fileURLToPath } from "url";
 
 
 const app = express();
@@ -19,21 +21,19 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Backend listening on port ${PORT}`);
 });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const staticDir = path.join(__dirname, "../frontend/dist");
+app.use(express.static(staticDir));
 
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+app.get(['/', '/:path(*)'], (req, res) => {
+  res.sendFile(path.join(staticDir, 'index.html'));
 });
+
 
 // const PORT = process?.env?.API_BACKEND_PORT || 8080;
 // const PORT = process.env.PORT || 8080
-const API_BACKEND_HOST = process?.env?.API_BACKEND_HOST || "127.0.0.1";
+const API_BACKEND_HOST = process?.env?.API_BACKEND_HOST || "0.0.0.0";
 const GOOGLE_CLOUD_LOCATION = process?.env?.GOOGLE_CLOUD_LOCATION;
 const GOOGLE_CLOUD_PROJECT = process?.env?.GOOGLE_CLOUD_PROJECT;
 
