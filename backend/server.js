@@ -14,6 +14,23 @@ import rateLimit from 'express-rate-limit';
 const app = express();
 app.use(express.json({limit: process?.env?.API_PAYLOAD_MAX_SIZE || "7mb"}));
 
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend listening on port ${PORT}`);
+});
+
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
+
 // const PORT = process?.env?.API_BACKEND_PORT || 8080;
 // const PORT = process.env.PORT || 8080
 const API_BACKEND_HOST = process?.env?.API_BACKEND_HOST || "127.0.0.1";
@@ -315,21 +332,5 @@ app.post('/api-proxy', async (req, res) => {
 //   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 // });
 
-const PORT = process.env.PORT || 8080;
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Backend listening on port ${PORT}`);
-});
-
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
-});
 
 
