@@ -26,10 +26,10 @@ const __dirname = path.dirname(__filename);
 const staticDir = path.join(__dirname, "../frontend/dist");
 app.use(express.static(staticDir));
 
-app.get(['/', '/:path(*)'], (req, res) => {
-  res.sendFile(path.join(staticDir, 'index.html'));
-});
-
+// app.get(['/', '/:path(*)'], (req, res) => {
+//   res.sendFile(path.join(staticDir, 'index.html'));
+// });
+app.get(/.*/, (req, res) => res.sendFile(path.join(staticDir, 'index.html')));
 
 // const PORT = process?.env?.API_BACKEND_PORT || 8080;
 // const PORT = process.env.PORT || 8080
